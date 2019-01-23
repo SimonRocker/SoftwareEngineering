@@ -47,7 +47,7 @@ public class Main {
                     for (int u = (i * 3); u < (i * 3) + 3; u++) {
                         System.out.println(figurs[u].getName());
                     }
-                    String input = String.valueOf(i + 1) + c.readLine();
+                    String input = String.valueOf(i + 1) + c.readLine().toUpperCase();
                     boolean korrekteFigurAusgewaehlt = false;
                     for (int o = (i * 3); o < (i * 3) + 3; o++) {
                         if (input.equals(figurs[o].getName())) {
@@ -61,13 +61,15 @@ public class Main {
                     if(!korrekteFigurAusgewaehlt)
                         System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
                 } while (!gezogen);
+            } else {
+                System.out.println("Nächster Spieler an der Reihe!");
             }
             i++;
         }
     }
 
     private static int getRandomDiceNumber() {
-        return ThreadLocalRandom.current().nextInt(1, 6 + 1);
+        return ThreadLocalRandom.current().nextInt(1, 7);
     }
 
     private static boolean zieheFigur(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
