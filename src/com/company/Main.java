@@ -62,7 +62,7 @@ public class Main {
                         System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
                 } while (!gezogen);
             } else {
-                System.out.println("Nächster Spieler an der Reihe!");
+                System.out.println("Nächster Spieler an der Reihe! \n");
             }
             i++;
         }
