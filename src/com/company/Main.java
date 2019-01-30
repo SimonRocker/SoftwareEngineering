@@ -7,14 +7,21 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
 
+    private static Feld[] fields = null;
+    private static FigurFactory f = new Figur.Factory();
+    private static FeldFactory feldFactory = new Feld.Factory();
     public static void main(String[] args) throws IOException {
 
         Spieler[] players = {new Spieler("Spieler 1", 1), new Spieler("Spieler 2", 2),
                 new Spieler("Spieler 3", 3), new Spieler("Spieler 4", 4)};
-        Figur[] figurs = {new Figur("1A"), new Figur("1B"), new Figur("1C"),
-                new Figur("2A"), new Figur("2B"), new Figur("2C"),
-                new Figur("3A"), new Figur("3B"), new Figur("3C"),
-                new Figur("4A"), new Figur("4B"), new Figur("4C")};
+        Figur[] figurs = {f.build("1A"), f.build("1B"), f.build("1C"),
+                f.build("2A"), f.build("2B"), f.build("2C"),
+                f.build("3A"), f.build("3B"), f.build("3C"),
+                f.build("4A"), f.build("4B"), f.build("4C")};
+
+        for(int i = 0; i < 48; i++) {
+            fields[i] = feldFactory.build(i);
+        }
         boolean isFinished = false;
         int i = 0;
         int wuerfelErgebnis;
@@ -31,7 +38,7 @@ public class Main {
                 wuerfelErgebnis = getRandomDiceNumber();
                 System.out.println("Das Würfelergebnis ist " + wuerfelErgebnis);
                 for (Figur figur : figurs) {
-                    System.out.println(figur.getName() + "  " + figur.getPosition());
+                    System.out.println(figur.getId() + "  " + figur.getField().getId());
                 }
                 if (alleImHaus(figurs, i + 1) && wuerfelErgebnis != 6) {
                     counter++;
@@ -45,12 +52,12 @@ public class Main {
                 do {
                     System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben vom Zeilenanfang an und drücken Sie enter!");
                     for (int u = (i * 3); u < (i * 3) + 3; u++) {
-                        System.out.println(figurs[u].getName());
+                        System.out.println(figurs[u].getId());
                     }
                     String input = String.valueOf(i + 1) + c.readLine().toUpperCase();
                     boolean korrekteFigurAusgewaehlt = false;
                     for (int o = (i * 3); o < (i * 3) + 3; o++) {
-                        if (input.equals(figurs[o].getName())) {
+                        if (input.equals(figurs[o].getId())) {
                             korrekteFigurAusgewaehlt = true;
                             gezogen = zieheFigur(figurs, figurs[o], wuerfelErgebnis, i);
                             if (!gezogen) {
@@ -73,12 +80,12 @@ public class Main {
     }
 
     private static boolean zieheFigur(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
-        if(zugMöglich(figurs, figur, wuerfelergebnis, playerId)) {
-            int newPosition = (figur.getPosition() + wuerfelergebnis) % 48;
-            if(figur.getPosition() == -1)
-                figur.setPosition(playerId * 12);
+        if(zugMoeglich(figurs, figur, wuerfelergebnis, playerId)) {
+            int newPosition = (figur.getField().getId() + wuerfelergebnis) % 48;
+            if(figur.getField().getId() == -1)
+                figur.setField(fields[playerId * 12]);
             else
-                figur.setPosition(newPosition);
+                figur.setField(fields[newPosition]);
             return true;
         }
         return false;
@@ -87,18 +94,18 @@ public class Main {
     private static boolean alleImHaus(Figur[] figurs, int playerId) {
         boolean alleImHaus = true;
         for (int p = ((playerId -1) * 3); p < ((playerId -1) * 3) + 3; p++) {
-            if (!(figurs[p].getPosition() == -1))
+            if (!(figurs[p].getField().getId() == -1))
                alleImHaus = false;
         }
         return alleImHaus;
     }
 
-    private static boolean zugMöglich(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
+    private static boolean zugMoeglich(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
 
         boolean startfeldBelegt = false;
-        if(figur.getPosition() != -1) {
+        if(figur.getField().getId() != -1) {
             for (Figur f: figurs) {
-                if((figur.getPosition() + wuerfelergebnis) % 48 == f.getPosition()) {
+                if((figur.getField().getId() + wuerfelergebnis) % 48 == f.getField().getId()) {
                     System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
                     return false;
                 }
@@ -111,23 +118,23 @@ public class Main {
         }
 
         for (Figur f: figurs) {
-            if(f.getPosition() == playerId * 12) {
+            if(f.getField().getId() == playerId * 12) {
                 startfeldBelegt = true;
             }
         }
 
         boolean mindestensEinerImHaus = false;
         for (int p = (playerId * 3); p < (playerId * 3) + 3; p++) {
-            if (figurs[p].getPosition() == -1)
+            if (figurs[p].getField().getId() == -1)
                 mindestensEinerImHaus = true;
         }
 
-        if(mindestensEinerImHaus && wuerfelergebnis == 6 && !(figur.getPosition() == -1)) {
+        if(mindestensEinerImHaus && wuerfelergebnis == 6 && !(figur.getField().getId() == -1)) {
             if(startfeldBelegt)
                 return true;
             System.out.println("Bitte wählen Sie eine Figur im Haus aus!");
             return false;
-        } else if(mindestensEinerImHaus && wuerfelergebnis == 6 && figur.getPosition() == -1 && startfeldBelegt) {
+        } else if(mindestensEinerImHaus && wuerfelergebnis == 6 && figur.getField().getId() == -1 && startfeldBelegt) {
             System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
             return false;
         }

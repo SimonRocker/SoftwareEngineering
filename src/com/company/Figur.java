@@ -1,27 +1,30 @@
 package com.company;
 
 public class Figur {
-    private String name;
-    private int position;
+    private String id;
+    private Feld field;
 
-    public Figur(String name) {
-        this.name = name;
-        this.position = -1;
+    public Figur(String id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Feld getField() {
+        return this.field;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setField(Feld field) {
+        this.field = field;
     }
 
-    public int getPosition() {
-        return position;
+    public String getId() {
+        return id;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public static class Factory implements FigurFactory {
+
+        @Override
+        public Figur build(String id){
+            return new Figur(id);
+        }
     }
 }
