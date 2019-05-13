@@ -4,8 +4,9 @@ public class Figur {
     private String id;
     private Feld field;
 
-    public Figur(String id) {
+    public Figur(String id, Feld field) {
         this.id = id;
+        this.field = field;
     }
 
     public Feld getField() {
@@ -18,13 +19,5 @@ public class Figur {
 
     public String getId() {
         return id;
-    }
-
-    public static class Factory implements FigurFactory {
-
-        @Override
-        public Figur build(String id){
-            return new Figur(id);
-        }
     }
 }

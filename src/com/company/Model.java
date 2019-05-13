@@ -3,50 +3,45 @@ package com.company;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Model {
+    private static List<Feld> fields = new ArrayList<>();
+    private static FigurFactory f = new FigurFactory();
+    private static FeldFactory feldFactory = new FeldFactory();
+    private boolean isFinished = false;
+    private List<Spieler> players = new ArrayList<>();
+    private List<Figur> figurs = new ArrayList<>();
+    private View view = new View();
+    private int counter = 0;
 
-    private static Feld[] fields = null;
-    private static FigurFactory f = new Figur.Factory();
-    private static FeldFactory feldFactory = new Feld.Factory();
-    private boolean initialized = false;
-
-    public Model(){}
-
-    public void initialize() throws IOException {
-
-        Spieler[] players = {new Spieler("Spieler 1", 1), new Spieler("Spieler 2", 2),
-                new Spieler("Spieler 3", 3), new Spieler("Spieler 4", 4)};
-        Figur[] figurs = {f.build("1A"), f.build("1B"), f.build("1C"),
-                f.build("2A"), f.build("2B"), f.build("2C"),
-                f.build("3A"), f.build("3B"), f.build("3C"),
-                f.build("4A"), f.build("4B"), f.build("4C")};
-
-        for(int i = 0; i < 48; i++) {
-            fields[i] = feldFactory.build(i);
+    public void initialize() {
+        players.addAll(List.of(new Spieler("Spieler 1", 1), new Spieler("Spieler 2", 2),
+                new Spieler("Spieler 3", 3), new Spieler("Spieler 4", 4)));
+        for (Spieler spieler : players) {
+            figurs.addAll(f.buildForPlayer(spieler.getId()));
         }
-        boolean isFinished = false;
-        int i = 0;
+        for (int i = 0; i < 48; i++) {
+            fields.set(i, feldFactory.build(i));
+        }
+    }
+
+        public void wuerfeln(int activePlayerId)throws IOException {
         int wuerfelErgebnis;
-        while (!isFinished) {
-            i = i % 4;
-            int counter = 0;
-            String activePlayer = players[i].getName();
-            BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
-            do{
-                System.out.println(activePlayer + " ist dran. \n" +
-                        //Figuren holen, jeweils ausgeben wo sie stehen
-                        "Bitte drücken sie Enter zum würfeln!");
-                c.readLine();
+        String activePlayerName = players.get(activePlayerId).getName();
+            do {
+                view.wuerfel(activePlayerName);
                 wuerfelErgebnis = getRandomDiceNumber();
                 System.out.println("Das Würfelergebnis ist " + wuerfelErgebnis);
+                //Figuren holen, jeweils ausgeben wo sie stehen
                 for (Figur figur : figurs) {
                     System.out.println(figur.getId() + "  " + figur.getField().getId());
                 }
-                if (alleImHaus(figurs, i + 1) && wuerfelErgebnis != 6) {
+                if (alleImHaus(activePlayerId) && wuerfelErgebnis != 6) {
                     counter++;
-                    System.out.println(counter + "er Versuch! Sie haben 3 Versuche!");
+                    view.counterAusgeben(counter);
                 } else {
                     break;
                 }
@@ -55,15 +50,16 @@ public class Model {
                 boolean gezogen = false;
                 do {
                     System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben vom Zeilenanfang an und drücken Sie enter!");
-                    for (int u = (i * 3); u < (i * 3) + 3; u++) {
-                        System.out.println(figurs[u].getId());
+                    for (int u = (activePlayerId * 3); u < (activePlayerId * 3) + 3; u++) {
+                        System.out.println(figurs.get(u).getId());
                     }
-                    String input = String.valueOf(i + 1) + c.readLine().toUpperCase();
+                    BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
+                    String input = String.valueOf(activePlayerId) + c.readLine().toUpperCase();
                     boolean korrekteFigurAusgewaehlt = false;
-                    for (int o = (i * 3); o < (i * 3) + 3; o++) {
-                        if (input.equals(figurs[o].getId())) {
+                    for (int o = (activePlayerId * 3); o < (activePlayerId * 3) + 3; o++) {
+                        if (input.equals(figurs.get(o).getId())) {
                             korrekteFigurAusgewaehlt = true;
-                            gezogen = zieheFigur(figurs, figurs[o], wuerfelErgebnis, i);
+                            gezogen = zieheFigur(figurs.get(o), wuerfelErgebnis, activePlayerId);
                             if (!gezogen) {
                                 System.out.println("Zug nicht möglich, bitte erneut auswählen!");
                             }
@@ -74,38 +70,36 @@ public class Model {
                 } while (!gezogen);
             } else {
                 System.out.println("Nächster Spieler an der Reihe! \n");
+                counter = 0;
             }
-            i++;
         }
-        this.initialized = true;
-    }
 
     private static int getRandomDiceNumber() {
         return ThreadLocalRandom.current().nextInt(1, 7);
     }
 
-    private static boolean zieheFigur(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
-        if(zugMoeglich(figurs, figur, wuerfelergebnis, playerId)) {
+    private boolean zieheFigur(Figur figur, int wuerfelergebnis, int playerId) {
+        if(zugMoeglich(figur, wuerfelergebnis, playerId)) {
             int newPosition = (figur.getField().getId() + wuerfelergebnis) % 48;
             if(figur.getField().getId() == -1)
-                figur.setField(fields[playerId * 12]);
+                figur.setField(fields.get(playerId * 12));
             else
-                figur.setField(fields[newPosition]);
+                figur.setField(fields.get(newPosition));
             return true;
         }
         return false;
     }
 
-    private static boolean alleImHaus(Figur[] figurs, int playerId) {
-        boolean alleImHaus = true;
-        for (int p = ((playerId -1) * 3); p < ((playerId -1) * 3) + 3; p++) {
-            if (!(figurs[p].getField().getId() == -1))
-                alleImHaus = false;
+    private boolean alleImHaus(int playerId) {
+        System.out.println(playerId);
+        for (int p = (playerId * 3); p < (playerId * 3) + 3; p++) {
+            if (!(figurs.get(p).getField().getId() == -1))
+               return false;
         }
-        return alleImHaus;
+        return true;
     }
 
-    private static boolean zugMoeglich(Figur[] figurs, Figur figur, int wuerfelergebnis, int playerId) {
+    private boolean zugMoeglich(Figur figur, int wuerfelergebnis, int playerId) {
 
         boolean startfeldBelegt = false;
         if(figur.getField().getId() != -1) {
@@ -130,7 +124,7 @@ public class Model {
 
         boolean mindestensEinerImHaus = false;
         for (int p = (playerId * 3); p < (playerId * 3) + 3; p++) {
-            if (figurs[p].getField().getId() == -1)
+            if (figurs.get(p).getField().getId() == -1)
                 mindestensEinerImHaus = true;
         }
 

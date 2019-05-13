@@ -10,11 +10,4 @@ public class Feld {
     public int getId() {
         return id;
     }
-
-    public static class Factory implements FeldFactory{
-
-        public Feld build(int id){
-            return new Feld(id);
-        }
-    }
     }
