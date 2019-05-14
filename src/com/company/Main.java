@@ -6,7 +6,7 @@ public class Main {
         try {
             controller.initialize();
         } catch(Exception e) {
-            System.out.println("Dumm gelaufen");
+            System.out.println(e);
         }
         controller.startGame();
     }

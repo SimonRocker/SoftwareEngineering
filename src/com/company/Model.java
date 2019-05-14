@@ -8,23 +8,23 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Model {
-    private static List<Feld> fields = new ArrayList<>();
+    private static List<Feld> fields = new ArrayList<>(48);
     private static FigurFactory f = new FigurFactory();
     private static FeldFactory feldFactory = new FeldFactory();
     private boolean isFinished = false;
-    private List<Spieler> players = new ArrayList<>();
-    private List<Figur> figurs = new ArrayList<>();
+    private List<Spieler> players = new ArrayList<>(3);
+    private List<Figur> figurs = new ArrayList<>(12);
     private View view = new View();
     private int counter = 0;
 
     public void initialize() {
-        players.addAll(List.of(new Spieler("Spieler 1", 1), new Spieler("Spieler 2", 2),
-                new Spieler("Spieler 3", 3), new Spieler("Spieler 4", 4)));
+        players.addAll(List.of(new Spieler("Spieler 1", 0), new Spieler("Spieler 2", 1),
+                new Spieler("Spieler 3", 2), new Spieler("Spieler 4", 3)));
         for (Spieler spieler : players) {
-            figurs.addAll(f.buildForPlayer(spieler.getId()));
+            figurs.addAll(f.buildForPlayer(spieler.getId() +1));
         }
         for (int i = 0; i < 48; i++) {
-            fields.set(i, feldFactory.build(i));
+            fields.add(i, feldFactory.build(i));
         }
     }
 
@@ -53,14 +53,14 @@ public class Model {
                 boolean gezogen = false;
                 do {
                     //Syso in View
-                    System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben vom Zeilenanfang an und drücken Sie enter!");
+                    System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
                     for (int u = (activePlayerId * 3); u < (activePlayerId * 3) + 3; u++) {
                         //Syso in View
                         System.out.println(figurs.get(u).getId());
                     }
                     //Input in Controller, Übergabe des Eingabewertes wieder hier hin zurück, neue Methode
                     BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
-                    String input = String.valueOf(activePlayerId) + c.readLine().toUpperCase();
+                    String input = String.valueOf(activePlayerId + 1) + c.readLine().toUpperCase();
                     boolean korrekteFigurAusgewaehlt = false;
                     for (int o = (activePlayerId * 3); o < (activePlayerId * 3) + 3; o++) {
                         if (input.equals(figurs.get(o).getId())) {
@@ -79,8 +79,8 @@ public class Model {
             } else {
                 //Syso in View, Aufruf des Zugendes in Controller
                 System.out.println("Nächster Spieler an der Reihe! \n");
-                counter = 0;
             }
+            counter = 0;
         }
 
     private static int getRandomDiceNumber() {
@@ -100,7 +100,6 @@ public class Model {
     }
 
     private boolean alleImHaus(int playerId) {
-        System.out.println(playerId);
         for (int p = (playerId * 3); p < (playerId * 3) + 3; p++) {
             if (!(figurs.get(p).getField().getId() == -1))
                return false;
