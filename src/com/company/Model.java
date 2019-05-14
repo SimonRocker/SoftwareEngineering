@@ -28,14 +28,16 @@ public class Model {
         }
     }
 
+    //int methode zum zurückgeben an den Controller, nötig beim Aufruf des Controllers. Oder wir halten es hier als Variable
         public void wuerfeln(int activePlayerId)throws IOException {
         int wuerfelErgebnis;
         String activePlayerName = players.get(activePlayerId).getName();
             do {
                 view.wuerfel(activePlayerName);
                 wuerfelErgebnis = getRandomDiceNumber();
+                //Syso in View
                 System.out.println("Das Würfelergebnis ist " + wuerfelErgebnis);
-                //Figuren holen, jeweils ausgeben wo sie stehen
+                //Figuren holen, jeweils ausgeben wo sie stehen, muss noch in View
                 for (Figur figur : figurs) {
                     System.out.println(figur.getId() + "  " + figur.getField().getId());
                 }
@@ -46,13 +48,17 @@ public class Model {
                     break;
                 }
             } while (counter < 3);
+            //Zweite Methode (ziehen)
             if (counter != 3) {
                 boolean gezogen = false;
                 do {
+                    //Syso in View
                     System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben vom Zeilenanfang an und drücken Sie enter!");
                     for (int u = (activePlayerId * 3); u < (activePlayerId * 3) + 3; u++) {
+                        //Syso in View
                         System.out.println(figurs.get(u).getId());
                     }
+                    //Input in Controller, Übergabe des Eingabewertes wieder hier hin zurück, neue Methode
                     BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
                     String input = String.valueOf(activePlayerId) + c.readLine().toUpperCase();
                     boolean korrekteFigurAusgewaehlt = false;
@@ -61,14 +67,17 @@ public class Model {
                             korrekteFigurAusgewaehlt = true;
                             gezogen = zieheFigur(figurs.get(o), wuerfelErgebnis, activePlayerId);
                             if (!gezogen) {
+                                //Syso in View
                                 System.out.println("Zug nicht möglich, bitte erneut auswählen!");
                             }
                         }
                     }
                     if(!korrekteFigurAusgewaehlt)
+                        //Syso in View
                         System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
                 } while (!gezogen);
             } else {
+                //Syso in View, Aufruf des Zugendes in Controller
                 System.out.println("Nächster Spieler an der Reihe! \n");
                 counter = 0;
             }
@@ -105,12 +114,14 @@ public class Model {
         if(figur.getField().getId() != -1) {
             for (Figur f: figurs) {
                 if((figur.getField().getId() + wuerfelergebnis) % 48 == f.getField().getId()) {
+                    //Syso in View
                     System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
                     return false;
                 }
             }
         } else {
             if(wuerfelergebnis != 6) {
+                //Syso in View
                 System.out.println("Sie müssen eine 6 würfeln um aus dem Haus zu kommen.");
                 return false;
             }
@@ -131,9 +142,11 @@ public class Model {
         if(mindestensEinerImHaus && wuerfelergebnis == 6 && !(figur.getField().getId() == -1)) {
             if(startfeldBelegt)
                 return true;
+            //Syso in View
             System.out.println("Bitte wählen Sie eine Figur im Haus aus!");
             return false;
         } else if(mindestensEinerImHaus && wuerfelergebnis == 6 && figur.getField().getId() == -1 && startfeldBelegt) {
+            //Syso in View
             System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
             return false;
         }

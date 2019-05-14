@@ -10,6 +10,7 @@ public class View {
         BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(activePlayer + " ist dran. \n" +
                 "Bitte drücken sie Enter zum würfeln!");
+        //Readline in Controller
         return c.readLine();
     }
 
