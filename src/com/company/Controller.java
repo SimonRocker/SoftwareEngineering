@@ -1,8 +1,16 @@
 package com.company;
 
+import com.company.observer.ModelObserver;
+
 public class Controller {
 
-    private Model model = new Model();
+    private Model model;
+
+    public Controller() {
+        this.model = new Model();
+        new ModelObserver(model);
+    }
+
     private int activePlayerId = 0;
     public void startGame() {
         do {

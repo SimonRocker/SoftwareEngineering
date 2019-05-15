@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.observer.Observer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,7 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Observer pattern note: This is the subject.
+ */
 public class Model {
+
+    private List<Observer> observers = new ArrayList<Observer>();
+
+
     private static List<Feld> fields = new ArrayList<>(48);
     private static FigurFactory f = new FigurFactory();
     private static FeldFactory feldFactory = new FeldFactory();
@@ -87,13 +96,17 @@ public class Model {
         return ThreadLocalRandom.current().nextInt(1, 7);
     }
 
-    private boolean zieheFigur(Figur figur, int wuerfelergebnis, int playerId) {
+    private boolean
+    zieheFigur(Figur figur, int wuerfelergebnis, int playerId) {
         if(zugMoeglich(figur, wuerfelergebnis, playerId)) {
             int newPosition = (figur.getField().getId() + wuerfelergebnis) % 48;
             if(figur.getField().getId() == -1)
                 figur.setField(fields.get(playerId * 12));
             else
                 figur.setField(fields.get(newPosition));
+
+            notifyAllModellObservers();
+
             return true;
         }
         return false;
@@ -151,4 +164,26 @@ public class Model {
         }
         return true;
     }
+
+    public static List<Feld> getFields() {
+        return fields;
+    }
+
+    public static void setFields(List<Feld> fields) {
+        Model.fields = fields;
+    }
+
+    /**
+     * Observer pattern
+     */
+    public void attach(Observer modelObserver) {
+        observers.add(modelObserver);
+    }
+
+    public void notifyAllModellObservers() {
+        for (Observer modelObserver : observers) {
+            modelObserver.update();
+        }
+    }
 }
+
