@@ -5,6 +5,8 @@ import com.company.Model;
 /**
  * @author Fabii
  */
-public interface Observer {
-    void update();
+public abstract class Observer {
+    protected Model gameModel;
+
+    public abstract void update();
 }

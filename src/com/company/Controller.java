@@ -9,6 +9,7 @@ public class Controller {
     public Controller() {
         this.model = new Model();
         new ModelObserver(model);
+        new View(model);
     }
 
     private int activePlayerId = 0;

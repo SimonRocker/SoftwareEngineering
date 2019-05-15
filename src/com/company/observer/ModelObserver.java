@@ -2,7 +2,7 @@ package com.company.observer;
 
 import com.company.Model;
 
-public class ModelObserver implements Observer {
+public class ModelObserver extends Observer {
     protected Model gameModel;
     public ModelObserver(Model gameModel) {
         this.gameModel = gameModel;
