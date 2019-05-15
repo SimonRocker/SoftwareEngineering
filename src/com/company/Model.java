@@ -105,6 +105,8 @@ public class Model {
             else
                 figur.setField(fields.get(newPosition));
 
+
+            // TODO - this notifies observers
             notifyAllModellObservers();
 
             return true;
