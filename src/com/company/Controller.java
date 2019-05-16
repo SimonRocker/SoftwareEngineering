@@ -12,18 +12,16 @@ public class Controller {
         new View(model);
     }
 
-    private int activePlayerId = 0;
+
     public void startGame() {
         do {
-            activePlayerId = activePlayerId % 4;
             wuerfeln();
-            activePlayerId++;
         }while(true);
     }
 
     public void wuerfeln(){
         try {
-            model.wuerfeln(activePlayerId);
+            model.wuerfeln();
         } catch(Exception e) {
             //Entfällt bei Observable
         }

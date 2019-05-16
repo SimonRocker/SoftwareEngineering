@@ -33,14 +33,15 @@ public class View extends Observer {
 
 
 
-        if (this.gameModel.getCurrentState().contains("Das Würfelergebnis ist")) {
             for (Figur figur : this.gameModel.getFigurs()) {
                 System.out.println(figur.getId() + "  " + figur.getField().getId());
             }
-        }
-            System.out.println(this.gameModel.getCurrentState());
             System.out.println("active player" +
                     this.gameModel.getActivePlayer());
+
+            this.counterAusgeben(this.gameModel.getCounter());
+            System.out.println("Das Würfelergebnis ist " + this.gameModel.getWuerfelErgebnis());
+
         }
     }
 }

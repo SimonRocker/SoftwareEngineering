@@ -26,7 +26,11 @@ public class Model {
 
     private List<Figur> figurs = new ArrayList<>(12);
     private View view = new View();
-    private int counter = 0;
+
+    private int counter = -1;
+
+
+    private int wuerfelErgebnis = -1;
     State state = State.init;
 
     enum State {
@@ -35,9 +39,8 @@ public class Model {
         ziehen
     }
 
-    private String currentState = "";
-
     private String activePlayer = "";
+    private int activePlayerId = 0;
 
     public void initialize() {
 
@@ -52,36 +55,36 @@ public class Model {
     }
 
     //int methode zum zurückgeben an den Controller, nötig beim Aufruf des Controllers. Oder wir halten es hier als Variable
-    public void wuerfeln(int activePlayerId) throws IOException {
+    public void wuerfeln() throws IOException {
         this.activePlayer = players.get(activePlayerId).getName();
         this.state = State.wuerfeln;
-        int wuerfelErgebnis;
         String activePlayerName = players.get(activePlayerId).getName();
         do {
             view.wuerfel(activePlayerName);
-            wuerfelErgebnis = getRandomDiceNumber();
+            this.wuerfelErgebnis = getRandomDiceNumber();
             //Syso in View
-            currentState = "Das Würfelergebnis ist " + wuerfelErgebnis;
             //Figuren holen, jeweils ausgeben wo sie stehen, muss noch in View
-            notifyAllModellObservers();
-            if (alleImHaus(activePlayerId) && wuerfelErgebnis != 6) {
+
+            if (alleImHaus(activePlayerId) && this.wuerfelErgebnis != 6) {
                 counter++;
-                view.counterAusgeben(counter);
             } else {
                 break;
             }
+            notifyAllModellObservers();
         } while (counter < 3);
+
         //Zweite Methode (ziehen)
         if (counter != 3) {
-            ziehen(activePlayerId, wuerfelErgebnis);
+            ziehen(activePlayerId);
         } else {
             //Syso in View, Aufruf des Zugendes in Controller
             System.out.println("Nächster Spieler an der Reihe! \n");
+            this.activePlayerId = ++this.activePlayerId % 4;
         }
         counter = 0;
     }
 
-    private void ziehen(int activePlayerId, int wuerfelErgebnis) throws IOException {
+    private void ziehen(int activePlayerId) throws IOException {
         boolean gezogen = false;
         this.state = State.ziehen;
 
@@ -99,7 +102,7 @@ public class Model {
             for (int o = (activePlayerId * 3); o < (activePlayerId * 3) + 3; o++) {
                 if (input.equals(figurs.get(o).getId())) {
                     korrekteFigurAusgewaehlt = true;
-                    gezogen = zieheFigur(figurs.get(o), wuerfelErgebnis, activePlayerId);
+                    gezogen = zieheFigur(figurs.get(o), activePlayerId);
                     if (!gezogen) {
                         //Syso in View
                         System.out.println("Zug nicht möglich, bitte erneut auswählen!");
@@ -110,6 +113,7 @@ public class Model {
                 //Syso in View
                 System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
         } while (!gezogen);
+        this.activePlayerId = ++this.activePlayerId % 4;
     }
 
     private static int getRandomDiceNumber() {
@@ -117,9 +121,9 @@ public class Model {
     }
 
     private boolean
-    zieheFigur(Figur figur, int wuerfelergebnis, int playerId) {
-        if (zugMoeglich(figur, wuerfelergebnis, playerId)) {
-            int newPosition = (figur.getField().getId() + wuerfelergebnis) % 48;
+    zieheFigur(Figur figur, int playerId) {
+        if (zugMoeglich(figur, playerId)) {
+            int newPosition = (figur.getField().getId() + this.wuerfelErgebnis) % 48;
             if (figur.getField().getId() == -1)
                 figur.setField(fields.get(playerId * 12));
             else
@@ -142,19 +146,19 @@ public class Model {
         return true;
     }
 
-    private boolean zugMoeglich(Figur figur, int wuerfelergebnis, int playerId) {
+    private boolean zugMoeglich(Figur figur, int playerId) {
 
         boolean startfeldBelegt = false;
         if (figur.getField().getId() != -1) {
             for (Figur f : figurs) {
-                if ((figur.getField().getId() + wuerfelergebnis) % 48 == f.getField().getId()) {
+                if ((figur.getField().getId() + this.wuerfelErgebnis) % 48 == f.getField().getId()) {
                     //Syso in View
                     System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
                     return false;
                 }
             }
         } else {
-            if (wuerfelergebnis != 6) {
+            if (this.wuerfelErgebnis != 6) {
                 //Syso in View
                 System.out.println("Sie müssen eine 6 würfeln um aus dem Haus zu kommen.");
                 return false;
@@ -173,13 +177,13 @@ public class Model {
                 mindestensEinerImHaus = true;
         }
 
-        if (mindestensEinerImHaus && wuerfelergebnis == 6 && !(figur.getField().getId() == -1)) {
+        if (mindestensEinerImHaus && this.wuerfelErgebnis == 6 && !(figur.getField().getId() == -1)) {
             if (startfeldBelegt)
                 return true;
             //Syso in View
             System.out.println("Bitte wählen Sie eine Figur im Haus aus!");
             return false;
-        } else if (mindestensEinerImHaus && wuerfelergebnis == 6 && figur.getField().getId() == -1 && startfeldBelegt) {
+        } else if (mindestensEinerImHaus && this.wuerfelErgebnis == 6 && figur.getField().getId() == -1 && startfeldBelegt) {
             //Syso in View
             System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
             return false;
@@ -216,14 +220,6 @@ public class Model {
         this.figurs = figurs;
     }
 
-    public String getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(String currentState) {
-        this.currentState = currentState;
-    }
-
 
     public String getActivePlayer() {
         return activePlayer;
@@ -231,6 +227,31 @@ public class Model {
 
     public void setActivePlayer(String activePlayer) {
         this.activePlayer = activePlayer;
+    }
+
+    public int getActivePlayerId() {
+        return activePlayerId;
+    }
+
+    public void setActivePlayerId(int activePlayerId) {
+        this.activePlayerId = activePlayerId;
+    }
+
+
+    public int getCounter() {
+        return counter;
+    }
+
+    public void setCounter(int counter) {
+        this.counter = counter;
+    }
+
+    public int getWuerfelErgebnis() {
+        return wuerfelErgebnis;
+    }
+
+    public void setWuerfelErgebnis(int wuerfelErgebnis) {
+        this.wuerfelErgebnis = wuerfelErgebnis;
     }
 }
 
