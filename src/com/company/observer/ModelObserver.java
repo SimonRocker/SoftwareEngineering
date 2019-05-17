@@ -11,6 +11,5 @@ public class ModelObserver extends Observer {
 
     @Override
     public void update() {
-        System.out.println("update called");
     }
 }

@@ -56,23 +56,20 @@ public class View extends Observer {
                     System.out.println(this.gameModel.getFigurs().get(u).getId());
                 }
                 if (this.gameModel.state != wrongFigure) {
-                System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");}
+                    System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
+                }
                 break;
             case wrongFigure:
                 System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
-
                 break;
             case figureNotInHouse:
-                System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
-
+                System.out.println("Bitte wählen Sie eine Figur im Haus aus!");
                 break;
             case sixrequired:
                 System.out.println("Sie müssen eine 6 würfeln um aus dem Haus zu kommen.");
-
                 break;
             case startfieldOccupied:
                 System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
-
                 break;
             case collision:
                 System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
@@ -81,7 +78,7 @@ public class View extends Observer {
 
         }
 
-        }
+    }
 
 
 }
