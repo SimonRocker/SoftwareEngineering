@@ -17,13 +17,6 @@ public class View extends Observer {
     public View() {
     }
 
-    public String wuerfel(String activePlayer) throws IOException {
-        BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println(activePlayer + " ist dran. \n" +
-                "Bitte drücken sie Enter zum würfeln!");
-        //Readline in Controller
-        return c.readLine();
-    }
 
     public void counterAusgeben(int counter) {
         System.out.println(counter + "er Versuch! Sie haben 3 Versuche!");
@@ -31,33 +24,27 @@ public class View extends Observer {
 
     @Override
     public void update() {
-        if (this.gameModel.state == Model.State.wuerfeln) {
-
-
-            for (Figur figur : this.gameModel.getFigurs()) {
-                System.out.println(figur.getId() + "  " + figur.getField().getId());
-            }
-            System.out.println("active player" +
-                    this.gameModel.getActivePlayer());
-
-            this.counterAusgeben(this.gameModel.getCounter());
-            System.out.println("Das Würfelergebnis ist " + this.gameModel.getWuerfelErgebnis());
-
-        }
 
         switch (this.gameModel.state) {
+            case wuerfeln:
+                wuerfeln();
+                break;
+            case waitForDiceThrow:
+                BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println(this.gameModel.getActivePlayer() + " ist dran. \n" +
+                        "Bitte drücken sie Enter zum würfeln!");
+                //Readline in Controller
+                try {
+                    c.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
             case zugNichtMoeglich:
                 System.out.println("Zug nicht möglich, bitte erneut auswählen!");
-
                 break;
             case ziehen:
-                for (int u = (this.gameModel.getActivePlayerId() * 3); u < (this.gameModel.getActivePlayerId() * 3) + 3; u++) {
-                    //Syso in View
-                    System.out.println(this.gameModel.getFigurs().get(u).getId());
-                }
-                if (this.gameModel.state != wrongFigure) {
-                    System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
-                }
+                ziehen();
                 break;
             case wrongFigure:
                 System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
@@ -73,11 +60,39 @@ public class View extends Observer {
                 break;
             case collision:
                 System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
-
                 break;
 
         }
 
+    }
+
+    private void wuerfeln() {
+        for (Figur figur : this.gameModel.getFigurs()) {
+            System.out.println(figur.getId() + "  " + figur.getField().getId());
+        }
+        System.out.println("active player" +
+                this.gameModel.getActivePlayer());
+
+        this.counterAusgeben(this.gameModel.getCounter());
+        System.out.println("Das Würfelergebnis ist " + this.gameModel.getWuerfelErgebnis());
+    }
+
+    private void ziehen() {
+
+        for (int u = (this.gameModel.getActivePlayerId() * 3); u < (this.gameModel.getActivePlayerId() * 3) + 3; u++) {
+            //Syso in View
+            System.out.println(this.gameModel.getFigurs().get(u).getId());
+        }
+        BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            gameModel.setInput(String.valueOf(this.gameModel.getActivePlayerId() + 1) + c.readLine().toUpperCase());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (this.gameModel.state != wrongFigure) {
+            System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
+        }
+        return;
     }
 
 

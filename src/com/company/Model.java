@@ -39,13 +39,17 @@ public class Model {
         ziehen,
         zugNichtMoeglich,
         wrongFigure,
-        sixrequired, startfieldOccupied, figureNotInHouse, collision
+        sixrequired, startfieldOccupied, figureNotInHouse, collision, waitForDiceThrow
     }
 
 
     private boolean playerChanged = false;
     private String activePlayer = "";
     private int activePlayerId = 0;
+
+
+    //TODO following line val should come from controller, fix soon
+    private String input;
 
     public void initialize() {
 
@@ -68,7 +72,9 @@ public class Model {
         this.state = State.wuerfeln;
         String activePlayerName = players.get(activePlayerId).getName();
         do {
-            view.wuerfel(activePlayerName);
+            this.state = State.waitForDiceThrow;
+            notifyAllModellObservers();
+            this.state = State.wuerfeln;
             this.wuerfelErgebnis = getRandomDiceNumber();
             //Figuren holen, jeweils ausgeben wo sie stehen, muss noch in View
 
@@ -99,11 +105,11 @@ public class Model {
         do {
             notifyAllModellObservers();
             //Input in Controller, Übergabe des Eingabewertes wieder hier hin zurück, neue Methode
-            BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
-            String input = String.valueOf(activePlayerId + 1) + c.readLine().toUpperCase();
+
+
             boolean korrekteFigurAusgewaehlt = false;
             for (int o = (activePlayerId * 3); o < (activePlayerId * 3) + 3; o++) {
-                if (input.equals(figurs.get(o).getId())) {
+                if (this.input.equals(figurs.get(o).getId())) {
                     korrekteFigurAusgewaehlt = true;
                     gezogen = zieheFigur(figurs.get(o), activePlayerId);
                     if (!gezogen) {
@@ -286,6 +292,14 @@ public class Model {
 
     public void setPlayerChanged(boolean playerChanged) {
         this.playerChanged = playerChanged;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
     }
 
 }
