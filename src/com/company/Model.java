@@ -38,7 +38,8 @@ public class Model {
         wuerfeln,
         ziehen,
         zugNichtMoeglich,
-        wrongFigure
+        wrongFigure,
+        sixrequired, startfieldOccupied, figureNotInHouse, collision
     }
 
 
@@ -96,12 +97,7 @@ public class Model {
         this.state = State.ziehen;
 
         do {
-            //Syso in View
             notifyAllModellObservers();
-            for (int u = (activePlayerId * 3); u < (activePlayerId * 3) + 3; u++) {
-                //Syso in View
-                System.out.println(figurs.get(u).getId());
-            }
             //Input in Controller, Übergabe des Eingabewertes wieder hier hin zurück, neue Methode
             BufferedReader c = new BufferedReader(new InputStreamReader(System.in));
             String input = String.valueOf(activePlayerId + 1) + c.readLine().toUpperCase();
@@ -175,14 +171,18 @@ public class Model {
             for (Figur f : figurs) {
                 if ((figur.getField().getId() + this.wuerfelErgebnis) % 48 == f.getField().getId()) {
                     //Syso in View
-                    System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
+                    this.state = State.collision;
+                    notifyAllModellObservers();
+                    this.state = State.ziehen;
                     return false;
                 }
             }
         } else {
             if (this.wuerfelErgebnis != 6) {
                 //Syso in View
-                System.out.println("Sie müssen eine 6 würfeln um aus dem Haus zu kommen.");
+                this.state = State.sixrequired;
+                notifyAllModellObservers();
+                this.state = State.ziehen;
                 return false;
             }
         }
@@ -190,6 +190,7 @@ public class Model {
         for (Figur f : figurs) {
             if (f.getField().getId() == playerId * 12) {
                 startfeldBelegt = true;
+
             }
         }
 
@@ -203,11 +204,15 @@ public class Model {
             if (startfeldBelegt)
                 return true;
             //Syso in View
-            System.out.println("Bitte wählen Sie eine Figur im Haus aus!");
+            this.state = State.figureNotInHouse;
+            notifyAllModellObservers();
+            this.state = State.ziehen;
             return false;
         } else if (mindestensEinerImHaus && this.wuerfelErgebnis == 6 && figur.getField().getId() == -1 && startfeldBelegt) {
             //Syso in View
-            System.out.println("Ihr Startfeld ist belegt, bitte wählen Sie eine andere Figur aus!");
+            this.state = State.startfieldOccupied;
+            notifyAllModellObservers();
+            this.state = State.ziehen;
             return false;
         }
         return true;
