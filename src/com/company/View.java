@@ -53,5 +53,12 @@ public class View extends Observer {
             System.out.println("Nächster Spieler an der Reihe! \n");
         }
 
+        if (this.gameModel.state == Model.State.ziehen && this.gameModel.state != Model.State.wrongFigure ) {
+            System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
+        }
+        if (this.gameModel.state == Model.State.wrongFigure) {
+            System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
+
+        }
     }
 }

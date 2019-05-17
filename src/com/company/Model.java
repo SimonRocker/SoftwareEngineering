@@ -37,7 +37,8 @@ public class Model {
         init,
         wuerfeln,
         ziehen,
-        zugNichtMoeglich
+        zugNichtMoeglich,
+        wrongFigure
     }
 
 
@@ -96,7 +97,7 @@ public class Model {
 
         do {
             //Syso in View
-            System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
+            notifyAllModellObservers();
             for (int u = (activePlayerId * 3); u < (activePlayerId * 3) + 3; u++) {
                 //Syso in View
                 System.out.println(figurs.get(u).getId());
@@ -115,9 +116,13 @@ public class Model {
                     }
                 }
             }
-            if (!korrekteFigurAusgewaehlt)
+            if (!korrekteFigurAusgewaehlt) {
                 //Syso in View
-                System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
+                // TODO replace while with recurrence to beautify the following three lines
+                this.state = State.wrongFigure;
+                notifyAllModellObservers();
+                this.state = State.ziehen;
+            }
         } while (!gezogen);
         this.activePlayerId = ++this.activePlayerId % 4;
     }
@@ -148,7 +153,7 @@ public class Model {
 
 
             // TODO - this notifies observers
-            notifyAllModellObservers();
+            //notifyAllModellObservers();
 
             return true;
         }
