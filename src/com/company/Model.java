@@ -36,9 +36,12 @@ public class Model {
     enum State {
         init,
         wuerfeln,
-        ziehen
+        ziehen,
+        zugNichtMoeglich
     }
 
+
+    private boolean playerChanged = false;
     private String activePlayer = "";
     private int activePlayerId = 0;
 
@@ -56,30 +59,33 @@ public class Model {
 
     //int methode zum zurückgeben an den Controller, nötig beim Aufruf des Controllers. Oder wir halten es hier als Variable
     public void wuerfeln() throws IOException {
+        this.playerChanged = false;
+
+        boolean weiterWuerfeln = true;
         this.activePlayer = players.get(activePlayerId).getName();
         this.state = State.wuerfeln;
         String activePlayerName = players.get(activePlayerId).getName();
         do {
             view.wuerfel(activePlayerName);
             this.wuerfelErgebnis = getRandomDiceNumber();
-            //Syso in View
             //Figuren holen, jeweils ausgeben wo sie stehen, muss noch in View
 
             if (alleImHaus(activePlayerId) && this.wuerfelErgebnis != 6) {
                 counter++;
             } else {
-                break;
+                weiterWuerfeln = false;
             }
             notifyAllModellObservers();
-        } while (counter < 3);
+        } while (counter < 3 && weiterWuerfeln);
 
         //Zweite Methode (ziehen)
         if (counter != 3) {
             ziehen(activePlayerId);
         } else {
             //Syso in View, Aufruf des Zugendes in Controller
-            System.out.println("Nächster Spieler an der Reihe! \n");
+            this.playerChanged = true;
             this.activePlayerId = ++this.activePlayerId % 4;
+            notifyAllModellObservers();
         }
         counter = 0;
     }
@@ -105,7 +111,7 @@ public class Model {
                     gezogen = zieheFigur(figurs.get(o), activePlayerId);
                     if (!gezogen) {
                         //Syso in View
-                        System.out.println("Zug nicht möglich, bitte erneut auswählen!");
+                        zugNichtMoeglich(activePlayerId);
                     }
                 }
             }
@@ -114,6 +120,17 @@ public class Model {
                 System.out.println("Bitte wählen Sie eine Figur korrekt aus!");
         } while (!gezogen);
         this.activePlayerId = ++this.activePlayerId % 4;
+    }
+
+    private void zugNichtMoeglich(int activePlayerId) {
+        this.state = State.zugNichtMoeglich;
+        notifyAllModellObservers();
+        try {
+            this.wuerfeln();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static int getRandomDiceNumber() {
@@ -253,6 +270,14 @@ public class Model {
     public void setWuerfelErgebnis(int wuerfelErgebnis) {
         this.wuerfelErgebnis = wuerfelErgebnis;
     }
+    public boolean isPlayerChanged() {
+        return playerChanged;
+    }
+
+    public void setPlayerChanged(boolean playerChanged) {
+        this.playerChanged = playerChanged;
+    }
+
 }
 
 

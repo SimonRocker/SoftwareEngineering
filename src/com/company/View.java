@@ -43,5 +43,15 @@ public class View extends Observer {
             System.out.println("Das Würfelergebnis ist " + this.gameModel.getWuerfelErgebnis());
 
         }
+
+        if (this.gameModel.state == Model.State.zugNichtMoeglich) {
+            System.out.println("Zug nicht möglich, bitte erneut auswählen!");
+
+        }
+
+        if (this.gameModel.getCounter() == 3) {
+            System.out.println("Nächster Spieler an der Reihe! \n");
+        }
+
     }
 }
