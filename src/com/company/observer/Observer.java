@@ -1,6 +1,6 @@
 package com.company.observer;
 
-import com.company.Model;
+import com.company.view.Model;
 
 /**
  * @author Fabii

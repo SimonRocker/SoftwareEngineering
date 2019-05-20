@@ -1,10 +1,13 @@
-package com.company;
+package com.company.view;
 
+import com.company.factory.FeldFactory;
+import com.company.factory.FigurFactory;
+import com.company.model.Spieler;
+import com.company.model.Feld;
+import com.company.model.Figur;
 import com.company.observer.Observer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,7 +42,11 @@ public class Model {
         ziehen,
         zugNichtMoeglich,
         wrongFigure,
-        sixrequired, startfieldOccupied, figureNotInHouse, collision, waitForDiceThrow
+        sixrequired,
+        startfieldOccupied,
+        figureNotInHouse,
+        collision,
+        waitForDiceThrow
     }
 
 

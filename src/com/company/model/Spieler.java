@@ -1,4 +1,4 @@
-package com.company;
+package com.company.model;
 
 public class Spieler {
     private String name;

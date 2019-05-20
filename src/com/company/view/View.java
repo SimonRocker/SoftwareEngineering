@@ -1,12 +1,13 @@
-package com.company;
+package com.company.view;
 
+import com.company.model.Figur;
 import com.company.observer.Observer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static com.company.Model.State.wrongFigure;
+import static com.company.view.Model.State.wrongFigure;
 
 public class View extends Observer {
     public View(Model gameModel) {

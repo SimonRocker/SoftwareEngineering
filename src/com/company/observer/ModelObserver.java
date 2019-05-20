@@ -1,6 +1,6 @@
 package com.company.observer;
 
-import com.company.Model;
+import com.company.view.Model;
 
 public class ModelObserver extends Observer {
     protected Model gameModel;

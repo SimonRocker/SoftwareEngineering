@@ -1,4 +1,7 @@
-package com.company;
+package com.company.factory;
+
+import com.company.model.Feld;
+import com.company.model.Figur;
 
 import java.util.List;
 

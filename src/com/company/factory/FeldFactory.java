@@ -1,4 +1,6 @@
-package com.company;
+package com.company.factory;
+
+import com.company.model.Feld;
 
 public class FeldFactory {
 
