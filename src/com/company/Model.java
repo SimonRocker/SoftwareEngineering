@@ -1,4 +1,4 @@
-package com.company.view;
+package com.company;
 
 import com.company.factory.FeldFactory;
 import com.company.factory.FigurFactory;
@@ -34,7 +34,7 @@ public class Model {
 
 
     private int wuerfelErgebnis = -1;
-    State state = State.init;
+    public State state = State.init;
 
     enum State {
         init,

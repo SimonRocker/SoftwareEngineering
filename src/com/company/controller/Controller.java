@@ -1,8 +1,8 @@
 package com.company.controller;
 
+import com.company.Model;
 import com.company.observer.ModelObserver;
-import com.company.view.Model;
-import com.company.view.View;
+import com.company.View;
 
 public class Controller {
 
