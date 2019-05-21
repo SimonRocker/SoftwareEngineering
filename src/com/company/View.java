@@ -62,6 +62,12 @@ public class View extends Observer {
             case collision:
                 System.out.println("Es gibt eine Kollision! Bitte wählen Sie eine andere Figur aus!");
                 break;
+            case movedFigure:
+                System.out.println("Figur gezogen von Feld " + gameModel.getPreviousField() + " nach Feld " + gameModel.getActualField() + "!");
+                break;
+            case zugVorbei:
+                System.out.println("Zug vorbei, nächster Spieler ist dran!");
+                break;
 
         }
 
@@ -71,15 +77,16 @@ public class View extends Observer {
         for (Figur figur : this.gameModel.getFigurs()) {
             System.out.println(figur.getId() + "  " + figur.getField().getId());
         }
-        System.out.println("active player" +
-                this.gameModel.getActivePlayer());
 
-        this.counterAusgeben(this.gameModel.getCounter());
         System.out.println("Das Würfelergebnis ist " + this.gameModel.getWuerfelErgebnis());
+        this.counterAusgeben(this.gameModel.getCounter());
     }
 
     private void ziehen() {
 
+        if (this.gameModel.state != wrongFigure) {
+            System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
+        }
         for (int u = (this.gameModel.getActivePlayerId() * 3); u < (this.gameModel.getActivePlayerId() * 3) + 3; u++) {
             //Syso in View
             System.out.println(this.gameModel.getFigurs().get(u).getId());
@@ -89,9 +96,6 @@ public class View extends Observer {
             gameModel.setInput(String.valueOf(this.gameModel.getActivePlayerId() + 1) + c.readLine().toUpperCase());
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        if (this.gameModel.state != wrongFigure) {
-            System.out.println("Welche Figur möchten Sie ziehen? Geben sie hierfür den Buchstaben der Figur an und drücken Sie enter!");
         }
         return;
     }

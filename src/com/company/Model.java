@@ -30,7 +30,9 @@ public class Model {
     private List<Figur> figurs = new ArrayList<>(12);
     private View view = new View();
 
-    private int counter = -1;
+    private int counter = 0;
+    private int previousField = -1;
+    private int actualField = -1;
 
 
     private int wuerfelErgebnis = -1;
@@ -46,7 +48,9 @@ public class Model {
         startfieldOccupied,
         figureNotInHouse,
         collision,
-        waitForDiceThrow
+        waitForDiceThrow,
+        movedFigure,
+        zugVorbei
     }
 
 
@@ -89,9 +93,14 @@ public class Model {
                 counter++;
             } else {
                 weiterWuerfeln = false;
+                counter++;
             }
             notifyAllModellObservers();
         } while (counter < 3 && weiterWuerfeln);
+
+        if (!(alleImHaus(activePlayerId) && this.wuerfelErgebnis != 6)) {
+            counter--;
+        }
 
         //Zweite Methode (ziehen)
         if (counter != 3) {
@@ -100,6 +109,7 @@ public class Model {
             //Syso in View, Aufruf des Zugendes in Controller
             this.playerChanged = true;
             this.activePlayerId = ++this.activePlayerId % 4;
+            this.state = State.zugVorbei;
             notifyAllModellObservers();
         }
         counter = 0;
@@ -154,15 +164,16 @@ public class Model {
     private boolean
     zieheFigur(Figur figur, int playerId) {
         if (zugMoeglich(figur, playerId)) {
-            int newPosition = (figur.getField().getId() + this.wuerfelErgebnis) % 48;
+            Feld newPosition;
             if (figur.getField().getId() == -1)
-                figur.setField(fields.get(playerId * 12));
+                newPosition = fields.get(playerId * 12);
             else
-                figur.setField(fields.get(newPosition));
-
-
-            // TODO - this notifies observers
-            //notifyAllModellObservers();
+                newPosition = fields.get((figur.getField().getId() + this.wuerfelErgebnis) % 48);
+            this.previousField = figur.getField().getId();
+            figur.setField(newPosition);
+            this.actualField = figur.getField().getId();
+            this.state = State.movedFigure;
+            notifyAllModellObservers();
 
             return true;
         }
@@ -309,6 +320,21 @@ public class Model {
         this.input = input;
     }
 
+    public int getPreviousField() {
+        return previousField;
+    }
+
+    public void setPreviousField(int previousField) {
+        this.previousField = previousField;
+    }
+
+    public int getActualField() {
+        return actualField;
+    }
+
+    public void setActualField(int actualField) {
+        this.actualField = actualField;
+    }
 }
 
 
