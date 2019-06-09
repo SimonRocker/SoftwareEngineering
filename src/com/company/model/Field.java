@@ -1,9 +1,9 @@
 package com.company.model;
 
-public class Feld {
+public class Field {
     private int id;
 
-    public Feld(int id){
+    public Field(int id){
         this.id = id;
     }
 

@@ -1,21 +1,19 @@
 package com.company.model;
 
-import com.company.model.Feld;
-
-public class Figur {
+public class Figure {
     private String id;
-    private Feld field;
+    private Field field;
 
-    public Figur(String id, Feld field) {
+    public Figure(String id, Field field) {
         this.id = id;
         this.field = field;
     }
 
-    public Feld getField() {
+    public Field getField() {
         return this.field;
     }
 
-    public void setField(Feld field) {
+    public void setField(Field field) {
         this.field = field;
     }
 
