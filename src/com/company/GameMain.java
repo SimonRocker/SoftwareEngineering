@@ -5,5 +5,6 @@ public class GameMain {
         IModel model = new Fassade();
         IObserver view = new ObserverView(model);
         Controller controller = new Controller(model, view);
+        controller.run();
     }
 }

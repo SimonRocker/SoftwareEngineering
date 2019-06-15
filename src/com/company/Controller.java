@@ -12,28 +12,31 @@ public class Controller {
 
         this.model = model;
         this.view = (ObserverView) view;
-
-        this.initialise();
     }
 
-    private void initialise() {
-        readEnterPressed();
+    public void run() {
+
+        this.view.askForDiceRoll();
+        this.readInput();
+
+
     }
 
-    private void readEnterPressed() {
-        view.askForDiceRoll();
+    private void readInput() {
         String input = new String();
-        try{
+        while (true) {
+
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            input = in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                input = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (input.length() == 0) {
+                this.model.rollDice();
+            }
         }
-
-        if (input.length() == 0) {
-            this.model.throwDice();
-        }
-
     }
+
 
 }
