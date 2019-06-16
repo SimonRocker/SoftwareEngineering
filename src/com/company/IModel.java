@@ -11,6 +11,10 @@ public interface IModel extends ISubject {
 
     void nextPlayer();
 
+    void turnValid(String figure);
+
+    void zieheFigur();
+
     int getCurrentPlayer();
 
     List<Field> getFields();
@@ -20,4 +24,8 @@ public interface IModel extends ISubject {
     int getTries();
 
     int getDiceValue();
+
+    String getPreviousField();
+
+    String getActualField();
 }

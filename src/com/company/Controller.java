@@ -32,11 +32,24 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (input.length() == 0) {
-                this.model.rollDice();
+            switch (input) {
+
+                case "A":
+                case "B":
+                case "C":
+                    this.model.turnValid(input);
+                    break;
+                case "":
+                    this.model.rollDice();
+                    break;
+                default:
+                    this.view.wrongInput();
+                    break;
             }
+
         }
     }
-
-
 }
+
+
+

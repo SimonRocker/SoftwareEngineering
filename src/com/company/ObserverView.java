@@ -25,8 +25,20 @@ public class ObserverView implements IObserver {
     private void showFields() {
         List field = this.model.getFields();
         for (Figure figure : this.model.getFigures()) {
-            System.out.print(figure.getId() + "  " + figure.getField().getId());
+            System.out.println(figure.getId() + "  " + figure.getField().getId());
         }
+    }
+
+    private void showPlayersFields() {
+        String figure;
+        for (int u = ((this.model.getCurrentPlayer()) * 3); u < ((this.model.getCurrentPlayer())* 3) + 3; u++) {
+            figure = this.model.getFigures().get(u).getId();
+            System.out.println(figure.charAt(1));
+        }
+    }
+
+    private void showTryNumber() {
+        System.out.printf("This is try number %d\n", this.model.getTries());
     }
 
     public void showDiceNumber() {
@@ -34,22 +46,43 @@ public class ObserverView implements IObserver {
     }
     @Override
     public void update(int state) {
+        // TODO - Debugging: System.out.println("State: " + state);
+        // TODO - Debugging: System.out.println("CurrentPlayer: " + this.model.getCurrentPlayer());
         switch (state) {
             case State.State_Roll_Dice:
-                this.showDiceNumber();
                 System.out.println("\n --- ");
                 this.askForDiceRoll();
-                System.out.printf("This is try number %d\n", this.model.getTries());
-
+                this.showTryNumber();
+                break;
+            case State.MState_Diced:
+                this.showDiceNumber();
                 break;
             case State.State_Next_Player:
                 this.model.nextPlayer();
                 break;
             case State.State_Make_Turn:
-                this.showFields();
+
+                this.showPlayersFields();
+                this.askForFigureSelection();
+                break;
+
+            case State.MState_Turn_Valid:
+                this.model.zieheFigur();
+                break;
+            case State.MState_Moved_Figure:
+                System.out.println("Figure moved from Field " + this.model.getPreviousField() + " nach Field " + this.model.getActualField() + "!");
+                this.model.nextPlayer();
                 break;
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException("State: " + String.valueOf(state));
         }
+    }
+
+    private void askForFigureSelection() {
+        System.out.println("Please select your figure to be moved: ");
+    }
+
+    public void wrongInput() {
+        System.out.println("wrong input");
     }
 }
