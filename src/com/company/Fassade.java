@@ -1,6 +1,9 @@
 package com.company;
 
 import com.company.model.Figure;
+import com.company.model.IModel;
+import com.company.model.Model;
+import com.company.model.State;
 
 import java.util.List;
 

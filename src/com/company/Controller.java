@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.model.IModel;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

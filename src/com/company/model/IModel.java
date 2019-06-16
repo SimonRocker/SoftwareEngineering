@@ -1,5 +1,6 @@
-package com.company;
+package com.company.model;
 
+import com.company.ISubject;
 import com.company.model.Field;
 import com.company.model.Figure;
 

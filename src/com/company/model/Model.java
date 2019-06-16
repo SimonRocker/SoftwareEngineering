@@ -1,10 +1,7 @@
-package com.company;
+package com.company.model;
 
 import com.company.factory.FieldFactory;
 import com.company.factory.FigureFactory;
-import com.company.model.Field;
-import com.company.model.Figure;
-import com.company.model.Spieler;
 
 import java.util.ArrayList;
 import java.util.List;

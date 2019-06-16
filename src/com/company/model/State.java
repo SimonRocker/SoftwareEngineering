@@ -1,4 +1,4 @@
-package com.company;
+package com.company.model;
 
 public class State {
     public static final int State_Next_Player = 0;
