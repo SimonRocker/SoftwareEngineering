@@ -5,6 +5,7 @@ import com.company.factory.FigureFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Model {
 
@@ -105,13 +106,12 @@ public class Model {
                 mindestensEinerImHaus = true;
         }
 
-        if (mindestensEinerImHaus && this.diceNumber == 6 && !(this.figureToMove .getField().getId() == -1)) {
+        if (mindestensEinerImHaus && this.diceNumber == 6 && !(this.figureToMove.getField().getId() == -1) && startfeldBelegt) {
             return State.MState_Turn_Valid;
-
-        } else if (mindestensEinerImHaus && this.diceNumber == 6 && this.figureToMove .getField().getId() == -1 && startfeldBelegt) {
-            //Syso in View
+        } else if (mindestensEinerImHaus && this.diceNumber == 6 && this.figureToMove.getField().getId() == -1 && startfeldBelegt) {
             return State.MState_Startfield_Occupied;
-
+        } else if(mindestensEinerImHaus && this.diceNumber != 6 && this.figureToMove.getField().getId() == -1) {
+            return State.MState_InvalidMove;
         }
         return State.MState_Turn_Valid;
     }
@@ -139,6 +139,7 @@ public class Model {
         boolean triesNotExpied = this.tries + 1 <= 3;
         if (notAbleToMakeTurn && triesNotExpied) {
             this.tries++;
+            return State.MState_Check_Turn;
         } else if (!triesNotExpied) {
 
             return State.State_Next_Player;
@@ -146,7 +147,10 @@ public class Model {
         } else if (randomNumber == 6) {
             return State.State_Make_Turn;
         }
-        return State.State_Roll_Dice;
+        if(areAllFiguresInHouse(this.currentPlayer))
+            return State.State_Roll_Dice;
+        else
+            return State.State_Make_Turn;
 
     }
 
@@ -169,9 +173,7 @@ public class Model {
     }
 
     private int calculateRandomNumber() {
-        //return 2;
-        return 6;
-        //return ThreadLocalRandom.current().nextInt(1, 7);
+        return ThreadLocalRandom.current().nextInt(1, 7);
     }
 
     public int getCurrentPlayer() {

@@ -22,8 +22,6 @@ public class Fassade extends Subject implements IModel {
     @Override
     public void rollDice() {
         if (this.currentState.getState() == State.State_Roll_Dice  ) {
-            this.currentState.setState(State.MState_Diced);
-            notify(this.currentState.getState());
             this.currentState.setState(gameModel.rollDice());
             notify(this.currentState.getState());
         }
@@ -54,6 +52,24 @@ public class Fassade extends Subject implements IModel {
             notify(this.currentState.getState());
         }
     }
+
+
+    @Override
+    public void resetStateAndTryAgain() {
+        if(this.currentState.getState() == State.MState_Startfield_Occupied || this.currentState.getState() == State.MState_InvalidMove) {
+            this.currentState.setState(State.State_Make_Turn);
+            notify(this.currentState.getState());
+        }
+    }
+
+    @Override
+    public void tryAgain() {
+        if(this.currentState.getState() == State.MState_Check_Turn) {
+            this.currentState.setState(State.State_Roll_Dice);
+            notify(this.currentState.getState());
+        }
+    }
+
     @Override
     public int getCurrentPlayer() {
         return this.gameModel.getCurrentPlayer();

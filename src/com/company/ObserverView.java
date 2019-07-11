@@ -56,15 +56,14 @@ public class ObserverView implements IObserver {
                 this.askForDiceRoll();
                 this.showTryNumber();
                 break;
-            case State.MState_Diced:
-                this.showDiceNumber();
-                break;
             case State.State_Next_Player:
+                this.showDiceNumber();
+                System.out.println("No tries left, next player on the line.");
                 this.model.nextPlayer();
                 break;
             case State.State_Make_Turn:
-
-                this.showPlayersFields();
+                this.showDiceNumber();
+                this.showFields();
                 this.askForFigureSelection();
                 break;
 
@@ -74,6 +73,23 @@ public class ObserverView implements IObserver {
             case State.MState_Moved_Figure:
                 System.out.println("Figure moved from Field " + this.model.getPreviousField() + " nach Field " + this.model.getActualField() + "!");
                 this.model.nextPlayer();
+                break;
+            case State.MState_InvalidMove:
+                invalidMove();
+                this.model.resetStateAndTryAgain();
+                break;
+            case State.MState_Startfield_Occupied:
+                startfieldOccupied();
+                this.model.resetStateAndTryAgain();
+                break;
+            case State.MState_Collision:
+                collison();
+                this.model.resetStateAndTryAgain();
+                break;
+            case State.MState_Check_Turn:
+                this.showDiceNumber();
+                System.out.println("Try again");
+                this.model.tryAgain();
                 break;
             default:
                 throw new IllegalStateException("State: " + String.valueOf(state));
@@ -86,5 +102,17 @@ public class ObserverView implements IObserver {
 
     public void wrongInput() {
         System.out.println("wrong input");
+    }
+
+    private void startfieldOccupied(){
+        System.out.println("Your Homefield is occupied, please select the figure on there.");
+    }
+
+    private void collison() {
+        System.out.println("Field already occupied, please select another figure.");
+    }
+
+    private void invalidMove() {
+        System.out.println("You can only leave your house with a 6.");
     }
 }

@@ -29,4 +29,8 @@ public interface IModel extends ISubject {
     String getPreviousField();
 
     String getActualField();
+
+    void resetStateAndTryAgain();
+
+    void tryAgain();
 }

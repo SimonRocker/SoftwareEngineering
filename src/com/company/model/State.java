@@ -9,7 +9,7 @@ public class State {
     public static final int MState_Startfield_Occupied = 5;
     public static final int MState_Check_Turn = 6;
     public static final int MState_Moved_Figure = 7;
-    public static final int MState_Diced = 8;
+    public static final int MState_InvalidMove = 8;
 
     public void setState(int state) {
         this.state = state;
