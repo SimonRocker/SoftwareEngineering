@@ -1,16 +1,14 @@
-package com.company;
+package com.company.gui;
 
-import com.company.model.Figure;
-import com.company.model.IModel;
-import com.company.model.State;
-
-import java.util.List;
+import com.company.logic.Figure;
+import com.company.logic.IGameModel;
+import com.company.logic.State;
 
 public class ObserverView implements IObserver {
 
-    private IModel model;
+    private IGameModel model;
 
-    public ObserverView(IModel model) {
+    public ObserverView(IGameModel model) {
         this.model = model;
         this.model.attach(this);
         this.initialise();
@@ -25,9 +23,8 @@ public class ObserverView implements IObserver {
     }
 
     private void showFields() {
-        List field = this.model.getFields();
         for (Figure figure : this.model.getFigures()) {
-            System.out.println(figure.getId() + "  " + figure.getField().getId());
+            System.out.println(figure.getId() + "  " + figure.getField().getPosition());
         }
     }
 
@@ -43,13 +40,12 @@ public class ObserverView implements IObserver {
         System.out.printf("This is try number %d\n", this.model.getTries());
     }
 
-    public void showDiceNumber() {
+    private void showDiceNumber() {
         System.out.printf("You diced a %s\n", this.model.getDiceValue());
     }
+
     @Override
     public void update(int state) {
-        // TODO - Debugging: System.out.println("State: " + state);
-        // TODO - Debugging: System.out.println("CurrentPlayer: " + this.model.getCurrentPlayer());
         switch (state) {
             case State.State_Roll_Dice:
                 System.out.println("\n --- ");
@@ -68,7 +64,7 @@ public class ObserverView implements IObserver {
                 break;
 
             case State.MState_Turn_Valid:
-                this.model.zieheFigur();
+                this.model.moveFigure();
                 break;
             case State.MState_Moved_Figure:
                 System.out.println("Figure moved from Field " + this.model.getPreviousField() + " nach Field " + this.model.getActualField() + "!");

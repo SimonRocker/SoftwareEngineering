@@ -1,6 +1,6 @@
 package com.company.factory;
 
-import com.company.model.Field;
+import com.company.logic.Field;
 
 public class FieldFactory {
 

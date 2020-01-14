@@ -1,20 +1,17 @@
 package com.company;
 
-import com.company.model.Figure;
-import com.company.model.IModel;
-import com.company.model.Model;
-import com.company.model.State;
+import com.company.logic.*;
+import com.company.logic.ports.MVCPort;
 
 import java.util.List;
 
-public class Fassade extends Subject implements IModel {
-    Model gameModel;
-    State currentState;
-    List fields;
-    List figures;
+public class Fassade extends Subject implements IGameModel {
+    private GameModel gameModel;
+    private MVCPort mvcPort;
+    private State currentState;
 
     public Fassade() {
-        this.gameModel = new Model();
+        this.gameModel = new GameModel();
         this.currentState = new State();
         this.currentState.setState(State.State_Roll_Dice);
     }
@@ -44,9 +41,9 @@ public class Fassade extends Subject implements IModel {
     }
 
     @Override
-    public void zieheFigur() {
+    public void moveFigure() {
         if (this.currentState.getState() == State.MState_Turn_Valid) {
-            this.currentState.setState(gameModel.zieheFigur());
+            this.currentState.setState(gameModel.moveFigure());
             notify(this.currentState.getState());
             this.currentState.setState(State.State_Next_Player);
             notify(this.currentState.getState());
@@ -76,7 +73,7 @@ public class Fassade extends Subject implements IModel {
     }
 
     @Override
-    public List getFields() {
+    public List<Field> getFields() {
         return this.gameModel.getFields();
     }
 
@@ -104,10 +101,4 @@ public class Fassade extends Subject implements IModel {
     public String getActualField() {
         return String.valueOf(this.gameModel.getActualField());
     }
-
-
-    public List getFigurs() {
-        return this.gameModel.getFigures();
-    }
-
 }

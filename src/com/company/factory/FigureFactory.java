@@ -1,7 +1,7 @@
 package com.company.factory;
 
-import com.company.model.Field;
-import com.company.model.Figure;
+import com.company.logic.Field;
+import com.company.logic.Figure;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.company;
+package com.company.gui;
 
 public interface IObserver  {
 

@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.logic;
 
 import com.company.factory.FieldFactory;
 import com.company.factory.FigureFactory;
@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Model {
+public class GameModel {
 
     private int currentPlayer;
-    private List<Spieler> players;
+    private List<Player> players;
     private List<Figure> figures;
 
 
@@ -42,27 +42,27 @@ public class Model {
     private int actualField;
     private Figure figureToMove;
 
-    public Model() {
+    public GameModel() {
         this.currentPlayer = 0;
         this.players = new ArrayList<>(3);
         this.figures = new ArrayList<>(12);
-        this.fields = new ArrayList<>(48);
+        fields = new ArrayList<>(48);
 
-        this.figureFactory = new FigureFactory();
-        this.fieldFactory = new FieldFactory();
+        figureFactory = new FigureFactory();
+        fieldFactory = new FieldFactory();
         this.tries = 1;
         this.initialise();
     }
 
-    public void initialise() {
+    private void initialise() {
 
-        this.players.addAll(List.of(new Spieler("Spieler 1", 0), new Spieler("Spieler 2", 1),
-                new Spieler("Spieler 3", 2), new Spieler("Spieler 4", 3)));
-        for (Spieler spieler : players) {
-            this.figures.addAll(this.figureFactory.buildForPlayer(spieler.getId()));
+        this.players.addAll(List.of(new Player("Player 1", 0), new Player("Player 2", 1),
+                new Player("Player 3", 2), new Player("Player 4", 3)));
+        for (Player player : players) {
+            this.figures.addAll(figureFactory.buildForPlayer(player.getId()));
         }
         for (int i = 0; i < 48; i++) {
-            this.fields.add(i, this.fieldFactory.build(i));
+            fields.add(i, fieldFactory.build(i));
         }
     }
 
@@ -83,9 +83,9 @@ public class Model {
             }
         }
         boolean startfeldBelegt = false;
-        if (this.figureToMove .getField().getId() != -1) {
+        if (this.figureToMove .getField().getPosition() != -1) {
             for (Figure f : this.figures) {
-                if ((this.figureToMove .getField().getId() + this.diceNumber) % 48 == f.getField().getId()) {
+                if ((this.figureToMove .getField().getPosition() + this.diceNumber) % 48 == f.getField().getPosition()) {
                     return State.MState_Collision;
 
                 }
@@ -94,7 +94,7 @@ public class Model {
 
 
         for (Figure f : this.figures) {
-            if (f.getField().getId() == this.currentPlayer * 12) {
+            if (f.getField().getPosition() == this.currentPlayer * 12) {
                 startfeldBelegt = true;
 
             }
@@ -102,30 +102,30 @@ public class Model {
 
         boolean mindestensEinerImHaus = false;
         for (int p = (this.currentPlayer * 3); p < (this.currentPlayer * 3) + 3; p++) {
-            if (figures.get(p).getField().getId() == -1)
+            if (figures.get(p).getField().getPosition() == -1)
                 mindestensEinerImHaus = true;
         }
 
-        if (mindestensEinerImHaus && this.diceNumber == 6 && !(this.figureToMove.getField().getId() == -1) && startfeldBelegt) {
+        if (mindestensEinerImHaus && this.diceNumber == 6 && !(this.figureToMove.getField().getPosition() == -1) && startfeldBelegt) {
             return State.MState_Turn_Valid;
-        } else if (mindestensEinerImHaus && this.diceNumber == 6 && this.figureToMove.getField().getId() == -1 && startfeldBelegt) {
+        } else if (mindestensEinerImHaus && this.diceNumber == 6 && this.figureToMove.getField().getPosition() == -1 && startfeldBelegt) {
             return State.MState_Startfield_Occupied;
-        } else if(mindestensEinerImHaus && this.diceNumber != 6 && this.figureToMove.getField().getId() == -1) {
+        } else if(mindestensEinerImHaus && this.diceNumber != 6 && this.figureToMove.getField().getPosition() == -1) {
             return State.MState_InvalidMove;
         }
         return State.MState_Turn_Valid;
     }
 
-    public int zieheFigur() {
+    public int moveFigure() {
 
         Field newPosition;
-        if (this.figureToMove .getField().getId() == -1)
+        if (this.figureToMove.getField().getPosition() == -1)
             newPosition = fields.get((this.currentPlayer) * 12);
         else
-            newPosition = fields.get((this.figureToMove .getField().getId() + this.diceNumber) % 48);
-        this.previousField = this.figureToMove .getField().getId();
-        this.figureToMove .setField(newPosition);
-        this.actualField = this.figureToMove .getField().getId();
+            newPosition = fields.get((this.figureToMove.getField().getPosition() + this.diceNumber) % 48);
+        this.previousField = this.figureToMove.getField().getPosition();
+        this.figureToMove.setField(newPosition);
+        this.actualField = this.figureToMove.getField().getPosition();
         return State.MState_Moved_Figure;
 
     }
@@ -165,8 +165,8 @@ public class Model {
     }
 
     private boolean areAllFiguresInHouse(int playerId) {
-        for (int p = (playerId * 3); p < (playerId * 3) + 3; p++) {
-            if (!(figures.get(p).getField().getId() == -1))
+        for (int p = (playerId * 3); p < ((playerId + 1) * 3); p++) {
+            if (figures.get(p).getField().getPosition() != -1)
                 return false;
         }
         return true;

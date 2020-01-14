@@ -1,4 +1,4 @@
-package com.company.model;
+package com.company.logic;
 
 public class Figure {
     private String id;

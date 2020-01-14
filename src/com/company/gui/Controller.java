@@ -1,16 +1,16 @@
-package com.company;
+package com.company.gui;
 
-import com.company.model.IModel;
+import com.company.logic.IGameModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Controller {
-    private IModel model;
+    private IGameModel model;
     private ObserverView view;
 
-    public Controller(IModel model, IObserver view) {
+    public Controller(IGameModel model, IObserver view) {
 
         this.model = model;
         this.view = (ObserverView) view;
@@ -25,7 +25,7 @@ public class Controller {
     }
 
     private void readInput() {
-        String input = new String();
+        String input = "";
         while (true) {
 
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

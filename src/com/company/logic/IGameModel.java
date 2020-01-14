@@ -1,12 +1,10 @@
-package com.company.model;
+package com.company.logic;
 
 import com.company.ISubject;
-import com.company.model.Field;
-import com.company.model.Figure;
 
 import java.util.List;
 
-public interface IModel extends ISubject {
+public interface IGameModel extends ISubject {
 
     void rollDice();
 
@@ -14,7 +12,7 @@ public interface IModel extends ISubject {
 
     void turnValid(String figure);
 
-    void zieheFigur();
+    void moveFigure();
 
     int getCurrentPlayer();
 

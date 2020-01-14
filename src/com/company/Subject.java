@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.gui.IObserver;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
