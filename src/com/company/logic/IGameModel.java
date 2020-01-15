@@ -12,9 +12,7 @@ public interface IGameModel extends ISubject {
 
     void turnValid(String figure);
 
-    void moveFigure();
-
-    int getCurrentPlayer();
+    Player getCurrentPlayer();
 
     List<Field> getFields();
 

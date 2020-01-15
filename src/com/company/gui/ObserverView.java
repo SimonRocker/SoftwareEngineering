@@ -15,7 +15,7 @@ public class ObserverView implements IObserver {
     }
 
     public void askForDiceRoll() {
-        System.out.printf("Player %d, Please press enter to roll the dice!\n", this.model.getCurrentPlayer() + 1);
+        System.out.printf("Player %d, Please press enter to roll the dice!\n", this.model.getCurrentPlayer().getId() + 1);
     }
 
     private void initialise() {
@@ -30,7 +30,7 @@ public class ObserverView implements IObserver {
 
     private void showPlayersFields() {
         String figure;
-        for (int u = ((this.model.getCurrentPlayer()) * 3); u < ((this.model.getCurrentPlayer())* 3) + 3; u++) {
+        for (int u = ((this.model.getCurrentPlayer().getId()) * 3); u < ((this.model.getCurrentPlayer().getId())* 3) + 3; u++) {
             figure = this.model.getFigures().get(u).getId();
             System.out.println(figure.charAt(1));
         }
@@ -53,7 +53,7 @@ public class ObserverView implements IObserver {
                 this.showTryNumber();
                 break;
             case State.State_Next_Player:
-                this.showDiceNumber();
+
                 System.out.println("No tries left, next player on the line.");
                 this.model.nextPlayer();
                 break;
@@ -63,9 +63,7 @@ public class ObserverView implements IObserver {
                 this.askForFigureSelection();
                 break;
 
-            case State.MState_Turn_Valid:
-                this.model.moveFigure();
-                break;
+
             case State.MState_Moved_Figure:
                 System.out.println("Figure moved from Field " + this.model.getPreviousField() + " nach Field " + this.model.getActualField() + "!");
                 this.model.nextPlayer();
@@ -109,6 +107,6 @@ public class ObserverView implements IObserver {
     }
 
     private void invalidMove() {
-        System.out.println("You can only leave your house with a 6.");
+        System.out.println("You can only leave your house with a 6 and a free start field.");
     }
 }

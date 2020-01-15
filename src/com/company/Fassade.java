@@ -40,15 +40,8 @@ public class Fassade extends Subject implements IGameModel {
         }
     }
 
-    @Override
-    public void moveFigure() {
-        if (this.currentState.getState() == State.MState_Turn_Valid) {
-            this.currentState.setState(gameModel.moveFigure());
-            notify(this.currentState.getState());
-            this.currentState.setState(State.State_Next_Player);
-            notify(this.currentState.getState());
-        }
-    }
+
+
 
 
     @Override
@@ -68,7 +61,7 @@ public class Fassade extends Subject implements IGameModel {
     }
 
     @Override
-    public int getCurrentPlayer() {
+    public Player getCurrentPlayer() {
         return this.gameModel.getCurrentPlayer();
     }
 

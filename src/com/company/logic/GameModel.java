@@ -9,18 +9,32 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameModel {
 
-    private int currentPlayer;
-    private List<Player> players;
-    private List<Figure> figures;
-
-
     private static List<Field> fields;
-
     private static FigureFactory figureFactory;
     private static FieldFactory fieldFactory;
 
+    private Player currentPlayerObject;
+    private List<Player> players;
+    private List<Figure> figures;
     private int tries;
     private int diceNumber;
+    private int previousField;
+    private int actualField;
+    private Figure figureToMove;
+
+    public GameModel() {
+
+        this.players = new ArrayList<>(3);
+        this.figures = new ArrayList<>(12);
+        fields = new ArrayList<>(48);
+
+        figureFactory = new FigureFactory();
+        fieldFactory = new FieldFactory();
+        this.tries = 1;
+        this.initialise();
+        this.currentPlayerObject = this.players.get(0);
+
+    }
 
     public int getPreviousField() {
         return previousField;
@@ -38,22 +52,6 @@ public class GameModel {
         this.actualField = actualField;
     }
 
-    private int previousField;
-    private int actualField;
-    private Figure figureToMove;
-
-    public GameModel() {
-        this.currentPlayer = 0;
-        this.players = new ArrayList<>(3);
-        this.figures = new ArrayList<>(12);
-        fields = new ArrayList<>(48);
-
-        figureFactory = new FigureFactory();
-        fieldFactory = new FieldFactory();
-        this.tries = 1;
-        this.initialise();
-    }
-
     private void initialise() {
 
         this.players.addAll(List.of(new Player("Player 1", 0), new Player("Player 2", 1),
@@ -68,59 +66,71 @@ public class GameModel {
 
     public int zugMoeglich(String figureId) {
         this.figureToMove = null;
-        figureId = String.valueOf(this.currentPlayer + figureId);
-        for (int o = ((this.currentPlayer) * 3); o < ((this.currentPlayer) * 3) + 3; o++) {
+        figureId = String.valueOf(this.currentPlayerObject.getId() + figureId);
+        for (int o = ((this.currentPlayerObject.getId()) * 3); o < ((this.currentPlayerObject.getId()) * 3) + 3; o++) {
             String temp = figures.get(o).getId();
             if (figureId.equals(temp)) {
-                this.figureToMove  = this.figures.get(o);
+                this.figureToMove = this.figures.get(o);
             }
         }
-        if (this.figureToMove  == null) {
+        boolean isFigureAtHome = isFigureAtHome(this.figureToMove);
+        if (this.figureToMove == null) {
             try {
                 throw new Exception("Figure not found");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        boolean startfeldBelegt = false;
-        if (this.figureToMove .getField().getPosition() != -1) {
-            for (Figure f : this.figures) {
-                if ((this.figureToMove .getField().getPosition() + this.diceNumber) % 48 == f.getField().getPosition()) {
-                    return State.MState_Collision;
+        int returnState = -1;
+        if (isFigureAtHome) {
+            if (this.diceNumber != 6) {
+                returnState = State.MState_InvalidMove;
+            } else {
+                int startFieldId = currentPlayerObject.getStartField();
+                boolean isOccupied = isOccupied(startFieldId);
+                if (!isOccupied) {
 
+                    this.figureToMove.setField(new Field(startFieldId, true));
+                    returnState = State.State_Next_Player;
+                } else {
+                    returnState = State.MState_InvalidMove;
                 }
             }
+        } else {
+
+            int position = (this.figureToMove.getField().getPosition() + this.diceNumber) % 48;
+            while (isOccupied(position)) {
+                position++;
+            }
+            this.figureToMove.setField(new Field(position, true));
+            returnState = State.State_Next_Player;
         }
 
+        return returnState;
+    }
 
+    private boolean isOccupied(int fieldId) {
         for (Figure f : this.figures) {
-            if (f.getField().getPosition() == this.currentPlayer * 12) {
-                startfeldBelegt = true;
+            if (f.getField().getPosition() == fieldId) {
+                return true;
 
             }
         }
+        return false;
+    }
 
-        boolean mindestensEinerImHaus = false;
-        for (int p = (this.currentPlayer * 3); p < (this.currentPlayer * 3) + 3; p++) {
-            if (figures.get(p).getField().getPosition() == -1)
-                mindestensEinerImHaus = true;
+    private boolean isFigureAtHome(Figure figureToMove) {
+        if (figureToMove.getField().getPosition() == -1) {
+            return true;
         }
-
-        if (mindestensEinerImHaus && this.diceNumber == 6 && !(this.figureToMove.getField().getPosition() == -1) && startfeldBelegt) {
-            return State.MState_Turn_Valid;
-        } else if (mindestensEinerImHaus && this.diceNumber == 6 && this.figureToMove.getField().getPosition() == -1 && startfeldBelegt) {
-            return State.MState_Startfield_Occupied;
-        } else if(mindestensEinerImHaus && this.diceNumber != 6 && this.figureToMove.getField().getPosition() == -1) {
-            return State.MState_InvalidMove;
-        }
-        return State.MState_Turn_Valid;
+        return false;
     }
 
     public int moveFigure() {
 
         Field newPosition;
         if (this.figureToMove.getField().getPosition() == -1)
-            newPosition = fields.get((this.currentPlayer) * 12);
+            newPosition = fields.get((this.currentPlayerObject.getId()) * 12);
         else
             newPosition = fields.get((this.figureToMove.getField().getPosition() + this.diceNumber) % 48);
         this.previousField = this.figureToMove.getField().getPosition();
@@ -132,31 +142,36 @@ public class GameModel {
 
     public int rollDice() {
 
-        int randomNumber = calculateRandomNumber();
+        int randomNumber = 6;
+
         this.diceNumber = randomNumber;
 
-        boolean notAbleToMakeTurn = randomNumber != 6 && areAllFiguresInHouse(this.currentPlayer);
-        boolean triesNotExpied = this.tries + 1 <= 3;
-        if (notAbleToMakeTurn && triesNotExpied) {
-            this.tries++;
-            return State.MState_Check_Turn;
-        } else if (!triesNotExpied) {
+        //boolean notAbleToMakeTurn = randomNumber != 6 && areAllFiguresInHouse(this.currentPlayerObject.getId());
+        boolean allFiguresInHouse = areAllFiguresInHouse(this.currentPlayerObject.getId());
 
-            return State.State_Next_Player;
+        boolean triesNotExpired = this.tries + 1 <= 3;
+        int returnState = -1;
 
-        } else if (randomNumber == 6) {
-            return State.State_Make_Turn;
+        if (allFiguresInHouse) {
+            if (randomNumber == 6) {
+                returnState = State.State_Make_Turn;
+            } else if (tries >= 3) {
+                returnState = State.State_Next_Player;
+            } else {
+                returnState = State.MState_Check_Turn;
+                tries++;
+            }
+
+        } else {
+            returnState = State.State_Make_Turn;
         }
-        if(areAllFiguresInHouse(this.currentPlayer))
-            return State.State_Roll_Dice;
-        else
-            return State.State_Make_Turn;
 
+        return returnState;
     }
 
     public int nextPlayer() {
         this.resetTries();
-        this.currentPlayer = (this.currentPlayer +1) % 4;
+        this.currentPlayerObject = this.players.get((this.currentPlayerObject.getId() + 1) % 4);
         return State.State_Roll_Dice;
     }
 
@@ -176,8 +191,8 @@ public class GameModel {
         return ThreadLocalRandom.current().nextInt(1, 7);
     }
 
-    public int getCurrentPlayer() {
-        return this.currentPlayer;
+    public Player getCurrentPlayer() {
+        return this.currentPlayerObject;
     }
 
     public List<Field> getFields() {

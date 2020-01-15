@@ -24,4 +24,8 @@ public class Player {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public int getStartField() {
+        return this.id * 12 ;
+    }
 }

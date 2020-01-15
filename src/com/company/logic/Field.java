@@ -7,6 +7,11 @@ public class Field {
         this.id = id;
     }
 
+    public Field(int id, boolean isOccupied) {
+        this.id = id;
+        this.isOccupied = isOccupied;
+    }
+
     public int getPosition() {
         return id;
     }
