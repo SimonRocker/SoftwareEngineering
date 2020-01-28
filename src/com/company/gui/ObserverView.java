@@ -1,10 +1,11 @@
 package com.company.gui;
 
+import com.company.gui.port.Ui;
 import com.company.logic.Figure;
 import com.company.logic.IGameModel;
 import com.company.logic.State;
 
-public class ObserverView implements IObserver {
+public class ObserverView implements IObserver, Ui {
 
     private IGameModel model;
 
@@ -16,6 +17,7 @@ public class ObserverView implements IObserver {
 
     public void askForDiceRoll() {
         System.out.printf("Player %d, Please press enter to roll the dice!\n", this.model.getCurrentPlayer().getId() + 1);
+
     }
 
     private void initialise() {
@@ -108,5 +110,13 @@ public class ObserverView implements IObserver {
 
     private void invalidMove() {
         System.out.println("You can only leave your house with a 6 and a free start field.");
+    }
+
+    @Override
+    public void startEventLoop(IGameModel model) {
+        this.model = model;
+
+        askForDiceRoll();
+
     }
 }
