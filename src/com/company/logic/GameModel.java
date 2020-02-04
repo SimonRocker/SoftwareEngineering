@@ -142,7 +142,7 @@ public class GameModel {
 
     public int rollDice() {
 
-        int randomNumber = 6;
+        int randomNumber = this.calculateRandomNumber();
 
         this.diceNumber = randomNumber;
 
